@@ -24,8 +24,12 @@ import { RxCross1 } from "react-icons/rx";
 const Header = ({ activeHeading }) => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
   const { isSeller } = useSelector((state) => state.seller);
+  const {allproducts} = useSelector((state) => state.products);
+  const {cart} = useSelector((state) => state.cart);
+  const { wishlist } = useSelector((state) => state.wishlist);
   
-
+  // console.log("userHeader", user);
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(null);
   const [active, setActive] = useState(false);
@@ -38,7 +42,7 @@ const Header = ({ activeHeading }) => {
     const term = e.target.value;
     setSearchTerm(term);
 
-    const filterProducts = productData.filter((product) =>
+    const filterProducts = allproducts.filter((product) =>
       product.name.toLowerCase().includes(term.toLowerCase())
     );
 
@@ -88,15 +92,12 @@ const Header = ({ activeHeading }) => {
               <div className="absolute min-h-[30vh] bg-slate-100 shadow-sm-2 z-[9] p-4">
                 {searchData &&
                   searchData.map((i, index) => {
-                    const d = i.name;
-
-                    const Product_name = d.replace(/\s+/g, "-");
 
                     return (
-                      <Link to={`/product/${Product_name}`} key={index}>
+                      <Link to={`/product/${i._id}`} key={index}>
                         <div className="w-full flex items-start-py-3">
                           <img
-                            src={i?.image_Url[0]?.url}
+                            src={i?.images[0]}
                             alt="pic"
                             className="w-[40px] h-[40px] mr-[10px]"
                           />
@@ -111,7 +112,7 @@ const Header = ({ activeHeading }) => {
 
             {/* best seller button */}
           <div className={`${styles.button}`}>
-            <Link to={`${isSeller ? "/dashboard" : "/shop-create"}`}>
+            <Link to="/shop-create">
               <h1 className="text-[#fff] flex items-center">
                 {" "}
                 Become Seller <IoIosArrowForward className="ml-1" />
@@ -175,7 +176,7 @@ const Header = ({ activeHeading }) => {
               >
                 <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%)" />
                 <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                  0
+                  {wishlist && wishlist.length}
                 </span>
               </div>
             </div>
@@ -190,7 +191,7 @@ const Header = ({ activeHeading }) => {
                   color="rgb(255 255 255 / 83%)"
                 />
                 <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                  1
+                  {cart && cart.length}
                 </span>
               </div>
             </div>
@@ -249,7 +250,7 @@ const Header = ({ activeHeading }) => {
             <div className="relative mr-[20px]">
               <AiOutlineShoppingCart size={30} />
               <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                1
+              {cart && cart.length}
               </span>
             </div>
           </div>
@@ -290,12 +291,10 @@ const Header = ({ activeHeading }) => {
                   <div className="absolute bg-[#fff] w-full left-0 shadow z-10 p-3 ">
                     {searchData &&
                       searchData.map((i, index) => {
-                        const d = i.name;
 
-                        const Product_name = d.replace(/\s+/g, "-");
 
                         return (
-                          <Link to={`/product/${Product_name}`} key={index}>
+                          <Link to={`/product/${i._id}`} key={index}>
                             <div className="w-full flex items-start-py-3">
                               <img
                                 src={i?.image_Url[0]?.url}

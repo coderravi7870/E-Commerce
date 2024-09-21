@@ -7,7 +7,8 @@ const initialState = {
     error: null,
     events:null,
     message: null,
-    deleteSuccess:false
+    deleteSuccess:false,
+    allEvents:null,
 };
 
 const eventSlice = createSlice({
@@ -30,18 +31,16 @@ const eventSlice = createSlice({
         },
 
         // get all events of shop
-        getAlleventsRequest: (state)=>{
+        getAlleventsShopRequest: (state)=>{
             state.isloading = true;
         },
-        getAlleventsSuccess: (state, action) => {
+        getAlleventsShopSuccess: (state, action) => {
             state.isloading = false;
             state.events = action.payload;
-            state.deleteSuccess = true;
         },
-        getAlleventsFaild: (state, action) => {
+        getAlleventsShopFaild: (state, action) => {
             state.isloading = false;
             state.error = action.payload;
-            state.deleteSuccess = false;
         },
 
         // delete events of a shop
@@ -51,8 +50,23 @@ const eventSlice = createSlice({
         deleteeventsSuccess: (state, action) => {
             state.isloading = false;
             state.message = action.payload;
+            state.deleteSuccess = true;
         },
         deleteeventsFailure: (state, action) => {
+            state.isloading = false;
+            state.error = action.payload;
+            state.deleteSuccess = false;
+        },
+
+         // get all events 
+         getAlleventsRequest: (state)=>{
+            state.isloading = true;
+        },
+        getAlleventsSuccess: (state, action) => {
+            state.isloading = false;
+            state.allEvents = action.payload;
+        },
+        getAlleventsFaild: (state, action) => {
             state.isloading = false;
             state.error = action.payload;
         },
@@ -63,6 +77,6 @@ const eventSlice = createSlice({
     },
 });
 
-export const { eventCreateRequest, eventCreateSuccess, eventCreateFail, clearErrors,getAlleventsRequest ,getAlleventsSuccess,getAlleventsFaild,deleteeventsRequest,deleteeventsSuccess,deleteeventsFailure} = eventSlice.actions;
+export const { eventCreateRequest, eventCreateSuccess, eventCreateFail, clearErrors,getAlleventsShopRequest,getAlleventsShopSuccess,getAlleventsShopFaild,deleteeventsRequest,deleteeventsSuccess,deleteeventsFailure,getAlleventsRequest,getAlleventsSuccess,getAlleventsFaild} = eventSlice.actions;
 export default eventSlice.reducer;
 

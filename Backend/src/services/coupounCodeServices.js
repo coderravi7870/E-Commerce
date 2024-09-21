@@ -80,4 +80,16 @@ exports.deleteCoupon = async (shopId) => {
       product:{},
     };
 };
+
+exports.getCoupon = async (req)=>{
+  const couponCode = await CoupounCode.findOne({name: req.params.name});
+
+
+  return {
+    success:1,
+    status: app_constants.SUCCESS,
+    message: "Find coupon code!",
+    couponCode,
+  }
+}
   

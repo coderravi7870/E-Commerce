@@ -16,4 +16,7 @@ coupounCodeRouter.get("/get-coupon/:id",isAuthenticated.isSeller,coupounCodeCont
 // delete coupoun code of a shop
 coupounCodeRouter.delete("/delete-coupon/:id",isAuthenticated.isSeller,coupounCodeController.deleteCoupon);
 
+// get coupon code value by its name 
+coupounCodeRouter.get("/get-coupon-value/:name",coupounCodeController.getCoupon);
+
 module.exports = coupounCodeRouter;

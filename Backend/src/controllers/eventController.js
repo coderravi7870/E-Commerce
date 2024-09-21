@@ -19,7 +19,7 @@ exports.createEvent = async (req,res)=>{
     }
 }
 
-exports.getAllEvents = async (req,res)=>{
+exports.getAllShopEvents = async (req,res)=>{
     try {
         // console.log(req.params);
         
@@ -34,7 +34,20 @@ exports.getAllEvents = async (req,res)=>{
                 message: validationResult
             })
         }
-        const response = await evnetServices.getAllEvents(req.params);
+        const response = await evnetServices.getAllShopEvents(req.params);
+        return res.json(response)
+    } catch (error) {
+        return res.json({
+            success: 0,
+            status_code: app_constants.INTERNAL_SERVER_ERROR,
+            message: error.message,
+          });
+    }
+}
+
+exports.getAllEvents = async (req,res)=>{
+    try {
+        const response = await evnetServices.getAllEvents();
         return res.json(response)
     } catch (error) {
         return res.json({

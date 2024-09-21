@@ -1,6 +1,6 @@
 import axios from "axios";
 import { server } from "../../server";
-import { deleteeventsFailure, deleteeventsRequest, deleteeventsSuccess, getAlleventsFaild, getAlleventsRequest, getAlleventsSuccess, eventCreateFail, eventCreateRequest, eventCreateSuccess } from "../slices/eventSlices";
+import { deleteeventsFailure, deleteeventsRequest, deleteeventsSuccess, eventCreateFail, eventCreateRequest, eventCreateSuccess, getAlleventsFaild, getAlleventsRequest, getAlleventsShopFaild, getAlleventsShopRequest, getAlleventsShopSuccess, getAlleventsSuccess } from "../slices/eventSlices";
 
 // create event 
 export const createevent = (newForm)=> async (dispatch)=>{
@@ -22,15 +22,14 @@ export const createevent = (newForm)=> async (dispatch)=>{
 // all events of a shop
 export const getAlleventsShop = (id)=> async (dispatch) => {
     try {
-        dispatch(getAlleventsRequest());
+        dispatch(getAlleventsShopRequest());
         
         
-        const response = await axios.get(`${server}/event/get-all-events/${id}`);
+        const {data} = await axios.get(`${server}/event/get-all-events/${id}`);
 
-        console.log("response: " + response.data.result);
-        dispatch(getAlleventsSuccess(response.data.result));
+        dispatch(getAlleventsShopSuccess(data.result));
     } catch (error) {
-        dispatch(getAlleventsFaild(error.response.data.message));
+        dispatch(getAlleventsShopFaild(error.response.data.message));
     }
 }
 
@@ -39,7 +38,7 @@ export const getAlleventsShop = (id)=> async (dispatch) => {
 export const deleteEvent = (id) => async (dispatch) => {
     try {
         dispatch(deleteeventsRequest());
-        console.log("delte",id);
+        // console.log("delte",id);
         
         const response = await axios.delete(`${server}/event/delete-event/${id}`,{
             withCredentials: true,
@@ -48,5 +47,18 @@ export const deleteEvent = (id) => async (dispatch) => {
         dispatch(deleteeventsSuccess(response.data.message));
     } catch (error) {
         dispatch(deleteeventsFailure(error.response.data.message));
+    }
+}
+
+export const getAllEvents = ()=>async(dispatch) =>{
+    try {
+        dispatch(getAlleventsRequest());
+
+        const {data} = await axios.get(`${server}/event/get-all-events`);
+        
+        
+        dispatch(getAlleventsSuccess(data.result));
+    } catch (error) {
+        dispatch(getAlleventsFaild(error.response.data.message));
     }
 }

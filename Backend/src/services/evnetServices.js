@@ -41,12 +41,24 @@ exports.createEvent = async (req) => {
 };
 
 
-exports.getAllEvents = async (shopId) => {
+exports.getAllShopEvents = async (shopId) => {
     // console.log("shopid", shopId);
   
     const result = await Event.find({ shopId: shopId.id });
     
     
+    return {
+      success: 1,
+      status: app_constants.SUCCESS,
+      message: "all Events of a shop found",
+      result,
+    };
+};
+
+exports.getAllEvents = async () => {
+    // console.log("shopid", shopId);
+  
+    const result = await Event.find();
     return {
       success: 1,
       status: app_constants.SUCCESS,

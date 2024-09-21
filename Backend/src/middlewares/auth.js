@@ -44,6 +44,7 @@ exports.isAuthenticated = async (req, res, next) => {
 exports.isSeller = async (req, res, next) => {
     const { seller_token } = req.cookies;
    
+//    console.log("seller token",seller_token);
    
     if (!seller_token) {
         return res.status(401).json({

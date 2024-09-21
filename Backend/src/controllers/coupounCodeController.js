@@ -68,3 +68,18 @@ exports.deleteCoupon = async (req,res)=>{
           });
     }
 }
+
+
+exports.getCoupon = async (req,res)=>{
+    try {
+         
+        const response = await coupounCodeServices.getCoupon(req);
+        return res.json(response)
+    } catch (error) {
+        return res.json({
+            success: 0,
+            status_code: app_constants.INTERNAL_SERVER_ERROR,
+            message: error.message,
+          });
+    }
+}

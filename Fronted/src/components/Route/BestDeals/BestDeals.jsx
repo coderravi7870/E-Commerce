@@ -6,23 +6,14 @@ import { productData } from "../../../static/Data";
 import { getAllProductShop } from "../../../redux/actions/product";
 
 const BestDeals = () => {
-  const { products,fetchSuccess } = useSelector((state) => state.products);
-  const { seller } = useSelector((state) => state.seller);
+  const { allproducts} = useSelector((state) => state.products);
   const [data, setData] = useState([]);
-  console.log("products", products);
-  console.log("seller", seller);
-  
 
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getAllProductShop(seller?._id));
-    // if(fetchSuccess){
-      const firstFive = products?.slice(0,5);
+ 
+  useEffect(()=>{
+      const firstFive = allproducts?.slice(0,5);
       setData(firstFive);
-    // }
-  }, [seller]); 
-
+  },[allproducts])
 
   // useEffect(() => {
   //   const firstFive = products?.slice(0,5);

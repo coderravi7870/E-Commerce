@@ -20,7 +20,7 @@ exports.createProduct = async (req,res)=>{
     }
 }
 
-exports.getAllProducts = async (req,res)=>{
+exports.getAllShopProducts = async (req,res)=>{
     try {
         // console.log(req.params);
         
@@ -35,7 +35,7 @@ exports.getAllProducts = async (req,res)=>{
                 message: validationResult
             })
         }
-        const response = await productsServices.getAllProducts(req.params);
+        const response = await productsServices.getAllShopProducts(req.params);
         return res.json(response)
     } catch (error) {
         return res.json({
@@ -62,6 +62,19 @@ exports.deleteProduct = async (req,res)=>{
             })
         }
         const response = await productsServices.deleteProduct(req.params);
+        return res.json(response)
+    } catch (error) {
+        return res.json({
+            success: 0,
+            status_code: app_constants.INTERNAL_SERVER_ERROR,
+            message: error.message,
+          });
+    }
+}
+
+exports.getAllProducts = async(req,res)=>{
+    try {
+        const response = await productsServices.getAllProducts();
         return res.json(response)
     } catch (error) {
         return res.json({

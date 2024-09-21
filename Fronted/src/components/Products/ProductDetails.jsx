@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "../../styles/Styles";
 import {
@@ -7,12 +7,34 @@ import {
   AiOutlineMessage,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllProductShop } from "../../redux/actions/product";
+import {
+  addToWishlist,
+  removeFromWishlist,
+} from "../../redux/actions/wishlist";
+import { addToCart } from "../../redux/actions/cart";
+import { toast } from "react-toastify";
 
 const ProductDetails = ({ data }) => {
+  const { products } = useSelector((state) => state.products);
+  const { wishlist } = useSelector((state) => state.wishlist);
+  const { cart } = useSelector((state) => state.cart);
+
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
-  const [select, setSelect] = useState(1);
+  const [select, setSelect] = useState(0);
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getAllProductShop(data?._id));
+    if (wishlist && wishlist.find((i) => i._id === data?._id)) {
+      setClick(true);
+    } else {
+      setClick(false);
+    }
+  }, [data, wishlist]);
 
   const incrementCount = () => {
     setCount(count + 1);
@@ -20,6 +42,31 @@ const ProductDetails = ({ data }) => {
 
   const decrementCount = () => {
     if (count > 1) setCount(count - 1);
+  };
+
+  const removeFromWishlistHandler = (data) => {
+    setClick(!click);
+    dispatch(removeFromWishlist(data));
+  };
+
+  const addToWishlistHandler = (data) => {
+    setClick(!click);
+    dispatch(addToWishlist(data));
+  };
+
+  const addToCartHandler = (id) => {
+    const isItemExists = cart && cart.find((i) => i._id === id);
+    if (isItemExists) {
+      toast.error("Item already in cart!");
+    } else {
+      if (data.stock < 1) {
+        toast.error("Product stock limited!");
+      } else {
+        const cartData = { ...data, qty: count };
+        dispatch(addToCart(cartData));
+        toast.success("Item added to cart successfully!");
+      }
+    }
   };
 
   const handleMessageSubmit = () => {
@@ -34,46 +81,39 @@ const ProductDetails = ({ data }) => {
             <div className="block w-full 800px:flex">
               <div className="w-full 800px:w-[50%]">
                 <img
-                  src={`${data && data.image_Url[select]?.url}`}
+                  src={`${data && data?.images[select]}`}
                   alt=""
-                  className="w-[80%]"
+                  className="w-[80%] h-[40%]"
                 />
-                <div className="w-full flex">
-                  <div
-                    className={`${
-                      select === 0 ? "border" : null
-                    } cursor-pointer`}
-                  >
-                    <img
-                      src={data?.image_Url[0].url}
-                      alt=""
-                      className="w-[200px]"
-                      onClick={() => setSelect(0)}
-                    />
-                  </div>
-                  <div
-                    className={`${
-                      select === 1 ? "border" : null
-                    } cursor-pointer`}
-                  >
-                    <img
-                      src={data?.image_Url[1].url}
-                      alt=""
-                      className="w-[200px]"
-                      onClick={() => setSelect(1)}
-                    />
-                  </div>
+                <div className="w-full flex mt-10 space-x-3">
+                  {data.images.length > 0 &&
+                    data?.images.map((img, index) => (
+                      <div
+                        className={`${
+                          select === index ? "border border-red-400" : null
+                        } cursor-pointer`}
+                        key={index}
+                        onClick={() => setSelect(index)}
+                      >
+                        <img
+                          src={img}
+                          alt=""
+                          className="w-[100px]"
+                          onClick={() => setSelect(0)}
+                        />
+                      </div>
+                    ))}
                 </div>
               </div>
               <div className="w-fulll 800px:w-[50%] pt-5">
-                <h1 className={`${styles.productTitle}`}>{data.name}</h1>
-                <p>{data.description}</p>
+                <h1 className={`${styles.productTitle}`}>{data?.name}</h1>
+                <p>{data?.description}</p>
                 <div className="flex pt-3">
                   <h4 className={`${styles.discount_price}`}>
-                    {data.discount_price}$
+                    {data.discountPrice}$
                   </h4>
                   <h3 className={`${styles.price}`}>
-                    {data.price ? data.price + "$" : null}
+                    {data.originalPrice ? data.originalPrice + "$" : null}
                   </h3>
                 </div>
                 <div className="flex items-center mt-12 justify-between pr-3">
@@ -100,7 +140,7 @@ const ProductDetails = ({ data }) => {
                       <AiFillHeart
                         size={30}
                         className="cursor-pointer "
-                        onClick={() => setClick(!click)}
+                        onClick={() => removeFromWishlistHandler(data)}
                         color={click ? "red" : "#333"}
                         title="Remove from wishlist"
                       />
@@ -108,7 +148,7 @@ const ProductDetails = ({ data }) => {
                       <AiOutlineHeart
                         size={30}
                         className="cursor-pointer "
-                        onClick={() => setClick(!click)}
+                        onClick={() => addToWishlistHandler(data)}
                         color={click ? "red" : "#333"}
                         title="Add to wishlist"
                       />
@@ -117,24 +157,27 @@ const ProductDetails = ({ data }) => {
                 </div>
                 <div
                   className={`${styles.button} !mt-6 !rounded !h-11 flex items-center`}
+                  onClick={() => addToCartHandler(data._id)}
                 >
                   <span className="text-white flex items-center">
                     Add to cart <AiOutlineShoppingCart className="ml-1" />
                   </span>
                 </div>
                 <div className="flex items-center pt-8">
-                  <img
-                    src={data.shop.shop_avatar.url}
-                    alt=""
-                    className="w-[50px] h-[50px] rounded-full mr-2"
-                  />
+                  <Link to={`/shop/preview/${data?.shop?._id}`}>
+                    <img
+                      src={data?.shop?.avatar}
+                      alt=""
+                      className="w-[50px] h-[50px] rounded-full mr-2"
+                    />
+                  </Link>
                   <div className="pr-8">
-                    <h3 className={`${styles.shop_name} pb-1 pt-1`}>
-                      {data.shop.name}
-                    </h3>
-                    <h5 className="pb-3 text-[15px]">
-                      ({data.shop.ratings}) Ratings
-                    </h5>
+                    <Link to={`/shop/preview/${data?.shop?._id}`}>
+                      <h3 className={`${styles.shop_name} pb-1 pt-1`}>
+                        {data?.shop?.name}
+                      </h3>
+                    </Link>
+                    <h5 className="pb-3 text-[15px]">(4/5) Ratings</h5>
                   </div>
                   <div
                     className={`${styles.button} bg-[#6443d1] mt-4 !rounded !h-11`}
@@ -148,8 +191,8 @@ const ProductDetails = ({ data }) => {
               </div>
             </div>
           </div>
-          
-          <ProductDetailsInfo data={data} />
+
+          <ProductDetailsInfo data={data} products={products} />
           <br />
           <br />
         </div>
@@ -158,7 +201,7 @@ const ProductDetails = ({ data }) => {
   );
 };
 
-const ProductDetailsInfo = ({ data }) => {
+const ProductDetailsInfo = ({ data, products }) => {
   const [active, setActive] = useState(1);
   return (
     <div className="bg-[#f5f6fb] px-3 800px:px-10 py-2 rounded">
@@ -207,33 +250,7 @@ const ProductDetailsInfo = ({ data }) => {
       {active === 1 ? (
         <>
           <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque
-            reiciendis pariatur nam distinctio, aspernatur magni atque explicabo
-            odit illo error quasi corporis et eligendi labore doloribus quam!
-            Officiis, saepe sequi. Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Doloremque reiciendis pariatur nam distinctio,
-            aspernatur magni atque explicabo odit illo error quasi corporis et
-            eligendi labore doloribus quam! Officiis, saepe sequi.
-          </p>
-          <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ipsum
-            voluptatum ab ducimus maiores nostrum asperiores perspiciatis natus,
-            earum expedita soluta velit, modi temporibus. Soluta odit vel
-            assumenda inventore debitis. Temporibus incidunt veritatis soluta
-            inventore, odit sint cumque, at aut iure, aliquid illo sit
-            exercitationem reprehenderit? Recusandae, corporis non provident
-            praesentium quis laboriosam accusantium nam rem fuga facere omnis
-            neque ipsum!
-          </p>
-          <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ipsum
-            voluptatum ab ducimus maiores nostrum asperiores perspiciatis natus,
-            earum expedita soluta velit, modi temporibus. Soluta odit vel
-            assumenda inventore debitis. Temporibus incidunt veritatis soluta
-            inventore, odit sint cumque, at aut iure, aliquid illo sit
-            exercitationem reprehenderit? Recusandae, corporis non provident
-            praesentium quis laboriosam accusantium nam rem fuga facere omnis
-            neque ipsum!
+            {data.description}
           </p>
         </>
       ) : null}
@@ -246,19 +263,19 @@ const ProductDetailsInfo = ({ data }) => {
       {active === 3 && (
         <div className="w-full block 800px:flex p-5">
           <div className="w-full 800px:w-[50%]">
-            <div className="flex items-center">
-              <img
-                src={data.shop.shop_avatar.url}
-                alt=""
-                className="w-[50px] h-[50px] rounded-full"
-              />
-              <div className="pl-3">
-                <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
-                <h5 className="pb-2 text-[15px]">
-                  ({data.shop.ratings}) Ratings
-                </h5>
+            <Link to={`/shop/preview/${data.shop._id}`}>
+              <div className="flex items-center">
+                <img
+                  src={data.shop.avatar}
+                  alt=""
+                  className="w-[50px] h-[50px] rounded-full"
+                />
+                <div className="pl-3">
+                  <h3 className={`${styles.shop_name}`}>{data?.shop?.name}</h3>
+                  <h5 className="pb-2 text-[15px]">(4/5) Ratings</h5>
+                </div>
               </div>
-            </div>
+            </Link>
             <p className="pt-2">
               Lorem ipsum dolor sit, amet consectetur adipisicing elit.
               Voluptates, dolore voluptatibus harum iure adipisci placeat nobis
@@ -269,10 +286,14 @@ const ProductDetailsInfo = ({ data }) => {
           <div className="w-full 800px:w-[50%] mt-5 800px:flex flex-col items-end">
             <div className="text-left">
               <h5 className="font-[600]">
-                Joined on : <span className="font-[500]">14 March,2023</span>
+                Joined on :{" "}
+                <span className="font-[500]">
+                  {data?.shop?.createdAt.slice(0, 10)}
+                </span>
               </h5>
               <h5 className="font-[600] pt-3">
-                Total Products : <span className="font-[500]">1,223</span>
+                Total Products :{" "}
+                <span className="font-[500]">{products.length}</span>
               </h5>
               <h5 className="font-[600] pt-3">
                 Total Products : <span className="font-[500]">324</span>

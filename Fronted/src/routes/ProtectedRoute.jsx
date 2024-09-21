@@ -1,19 +1,20 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom"
-import Loader from "../components/Layout/Loader";
+// import Loader from "../components/Layout/Loader";
+// import { useEffect } from "react";
+// import { loadUser } from "../redux/actions/user";
 
 
 const ProtectedRoute = ({children})=>{
     const {loading,isAuthenticated } = useSelector((state) => state.user);
-    if (loading === true) {
-        return <Loader />;
-      } 
-    else{
-        if(!isAuthenticated){
-            return <Navigate to="/login" replace />;
+
+    
+    if (loading === false) {
+        if (!isAuthenticated) {
+          return <Navigate to="/login" replace />;
         }
-        return children
-    }
+        return children;
+      }
     
 }
 

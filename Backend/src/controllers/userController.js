@@ -95,11 +95,76 @@ exports.getUser = async (req,res)=>{
 
 exports.logoutUser = async (req,res)=>{
     try {
-        
-        
         const response = await userServices.logoutUser(res);
-       console.log("response",response);
+        return res.json(response)
+    } catch (error) {
+        return res.json({
+            success: 0,
+            status_code: app_constants.INTERNAL_SERVER_ERROR,
+            message: error.message,
+          });
+    }
+}
+
+exports.updateUser = async (req,res)=>{
+    try {
+        const response = await userServices.updateUser(req.body);
+        return res.json(response)
+    } catch (error) {
+        return res.json({
+            success: 0,
+            status_code: app_constants.INTERNAL_SERVER_ERROR,
+            message: error.message,
+          });
+    }
+}
+
+exports.updateUserAvatar = async (req,res)=>{
+    try {
         
+        const response = await userServices.updateUserAvatar(req);
+        return res.json(response)
+    } catch (error) {
+        return res.json({
+            success: 0,
+            status_code: app_constants.INTERNAL_SERVER_ERROR,
+            message: error.message,
+          });
+    }
+}
+
+exports.updateUserAddresses = async (req,res)=>{
+    try {
+        
+        const response = await userServices.updateUserAddresses(req);
+        return res.json(response)
+    } catch (error) {
+        return res.json({
+            success: 0,
+            status_code: app_constants.INTERNAL_SERVER_ERROR,
+            message: error.message,
+          });
+    }
+}
+
+
+exports.deleteUserAddress = async (req,res)=>{
+    try {
+        
+        const response = await userServices.deleteUserAddress(req);
+        return res.json(response)
+    } catch (error) {
+        return res.json({
+            success: 0,
+            status_code: app_constants.INTERNAL_SERVER_ERROR,
+            message: error.message,
+          });
+    }
+}
+
+exports.updateUserPassword = async (req,res)=>{
+    try {
+        const response = await userServices.updateUserPassword(req);
         return res.json(response)
     } catch (error) {
         return res.json({

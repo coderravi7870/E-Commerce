@@ -9,9 +9,12 @@ const upload = multer({ dest: "uploads/" })
 // create product
 productsRouter.post("/create-product",upload.array("images"),productsController.createProduct)
 // get all products of a particular shop
-productsRouter.get("/get-all-products-shop/:id",productsController.getAllProducts);
+productsRouter.get("/get-all-products-shop/:id",productsController.getAllShopProducts);
 
 // delete product of a shop
 productsRouter.delete("/delete-shop-product/:id",isAuthenticated.isSeller,productsController.deleteProduct);
+
+// get all products
+productsRouter.get("/get-all-products",productsController.getAllProducts);
 
 module.exports = productsRouter;

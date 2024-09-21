@@ -1,6 +1,6 @@
 import axios from "axios";
 import { server } from "../../server";
-// import {   getAllProductsFaild, getAllProductsRequest, getAllProductsSuccess, productCreateFail, productCreateRequest, productCreateSuccess } from "../slices/productSlices";
+
 
 // create product 
 export const createProduct = (newForm)=> async (dispatch)=>{
@@ -40,13 +40,13 @@ export const getAllProductShop = (id)=> async (dispatch) => {
             type: "getAllProductsShopRequest",
           });
 
-        const response = await axios.get(`${server}/products/get-all-products-shop/${id}`);
-        console.log("response: " + response.data.result);
+        const {data} = await axios.get(`${server}/products/get-all-products-shop/${id}`);
+        // console.log("response: " + data.result);
         
-        if(response.data.success) {
+        if(data.success) {
             dispatch({
                 type: "getAllProductsShopSuccess",
-                payload: response.data.result,
+                payload: data.result,
               });
         }
         else {
@@ -93,3 +93,33 @@ export const deleteProduct = (id) => async (dispatch) => {
         })
     }
 }
+
+// get all products
+export const getAllProducts =()=> async (dispatch) => {
+    try {
+      dispatch({
+        type: "getAllProductsRequest",
+      });
+    //   console.log("ram ram");
+      
+      const { data } = await axios.get(`${server}/products/get-all-products`);
+    //   console.log("all products",data);
+      if(data.success){
+        dispatch({
+            type: "getAllProductsSuccess",
+            payload: data.result,
+          });
+      }else{
+        dispatch({
+            type: "getAllProductsFailed",
+            payload: data.message,
+          });
+      }
+      
+    } catch (error) {
+      dispatch({
+        type: "getAllProductsFailed",
+        payload: error.response,
+      });
+    }
+};

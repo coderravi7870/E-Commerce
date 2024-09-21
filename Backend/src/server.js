@@ -27,12 +27,16 @@ const shopRounter = require("./routes/shopRounter");
 const productsRouter = require("./routes/productsRouter");
 const eventRouter = require("./routes/eventRouter");
 const coupounCodeRouter = require("./routes/coupounCodeRouter");
+const paymentCodeRouter = require("./routes/paymentCodeRouter");
+const orderRouter = require("./routes/orderRouter");
 
 app.use("/user", userRouter);
 app.use("/shop",shopRounter);
 app.use("/products",productsRouter)
 app.use("/event",eventRouter);
 app.use("/coupon",coupounCodeRouter);
+app.use("/payment",paymentCodeRouter);
+app.use("/order",orderRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT,async()=>{

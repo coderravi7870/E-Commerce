@@ -64,7 +64,7 @@ exports.createProduct = async (req) => {
   }
 };
 
-exports.getAllProducts = async (shopId) => {
+exports.getAllShopProducts = async (shopId) => {
   // console.log("shopid", shopId);
 
   const result = await Product.find({ shopId: shopId.id });
@@ -111,3 +111,16 @@ exports.deleteProduct = async (shopId) => {
     result:{},
   };
 };
+
+exports.getAllProducts = async ()=>{
+  // console.log("rm kdfj;sl");
+  
+
+  const result = await Product.find().sort({ createdAt: -1 });
+  return {
+    success:1,
+    status: app_constants.SUCCESS,
+    message:"all products fetched successfully!",
+    result
+  }
+}

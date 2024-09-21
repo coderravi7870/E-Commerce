@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const CountDown = () => {
+const CountDown = ({data}) => {
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
@@ -13,7 +13,9 @@ const CountDown = () => {
 
   function calculateTimeLeft() {
    // Set a future time on the same date (e.g., 23:59:59)
-  const targetDate = new Date("2024-08-30T00:00:00"); // Changed to the next day
+  //  console.log("data.finished",data?.Finish_Date);
+   
+  const targetDate = new Date(data?.Finish_Date); // Changed to the next day
   const currentDate = new Date();
   const difference = targetDate - currentDate;
 
@@ -41,6 +43,8 @@ const CountDown = () => {
       </span>
     );
   });
+  // console.log(timerComponents);
+  
 
   return (
     <div>

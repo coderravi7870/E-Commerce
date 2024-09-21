@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   LoginPage,
@@ -15,6 +15,8 @@ import {
   ShopCreatePage,
   SellerActivationPage,
   ShopLoginPage,
+  PaymentPage,
+  OrderSuccessPage
 } from "./routes/Routes.jsx";
 
 import {
@@ -25,6 +27,9 @@ import {
   ShopCreateEvents,
   ShopAllEvents,
   ShopAllCoupouns,
+  ShopPreviewPage,
+  ShopAllOrders,
+  ShopOrderDetails
 } from "./routes/ShopRoutes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -33,16 +38,46 @@ import Store from "./redux/store.jsx";
 import { loadSeller, loadUser } from "./redux/actions/user.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute.jsx";
+import { getAllProducts } from "./redux/actions/product.jsx";
+import { getAllEvents } from "./redux/actions/event.jsx";
+import axios from "axios";
+import { server } from "./server.js";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
 const App = () => {
+  const [stripeApiKey, setStripeApiKey] = useState("");
+
+  async function getStripeApiKey() {
+    const { data } = await axios.get(`${server}/payment/stripeapikey`);
+    setStripeApiKey(data);
+  }
   useEffect(() => {
-    Store.dispatch(loadUser);
-    Store.dispatch(loadSeller);
+    Store.dispatch(loadUser());
+    console.log("Ram ram ");
+    Store.dispatch(loadSeller());
+    Store.dispatch(getAllProducts());
+    Store.dispatch(getAllEvents());
+    getStripeApiKey();
   }, []);
 
   return (
     <>
       <BrowserRouter>
+        {stripeApiKey && (
+          <Elements stripe={loadStripe(stripeApiKey)}>
+            <Routes>
+              <Route
+                path="/payment"
+                element={
+                  <ProtectedRoute>
+                    <PaymentPage />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Elements>
+        )}
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -56,7 +91,8 @@ const App = () => {
             element={<SellerActivationPage />}
           />
           <Route path="/products" element={<ProductsPage />} />
-          <Route path="/product/:name" element={<ProductDetailsPage />} />
+          <Route path="/product/:id" element={<ProductDetailsPage />} />
+         
           <Route path="/best-selling" element={<BestSellingPage />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/faq" element={<FAQPage />} />
@@ -68,6 +104,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/order/success" element={<OrderSuccessPage />} />
           <Route
             path="/profile"
             element={
@@ -88,7 +125,7 @@ const App = () => {
               </SellerProtectedRoute>
             }
           />
-
+          <Route path="/shop/preview/:id" element={<ShopPreviewPage />} />
           <Route
             path="/dashboard"
             element={
@@ -107,6 +144,22 @@ const App = () => {
             }
           />
 
+          <Route
+            path="/dashboard-orders"
+            element={
+              <SellerProtectedRoute>
+                <ShopAllOrders />
+              </SellerProtectedRoute>
+            }
+          />
+          <Route
+            path="/order/:id"
+            element={
+              <SellerProtectedRoute>
+                <ShopOrderDetails />
+              </SellerProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard-products"
             element={

@@ -7,7 +7,6 @@ const EventsPage = () => {
     <div>
         <Header/>
         <EventCard active={true}/>
-        <EventCard active={true}/>
     </div>
   )
 }
